@@ -1,12 +1,16 @@
 import Constants from 'expo-constants';
 
 export const generateAPIUrl = (relativePath: string) => {
-  const origin = Constants.experienceUrl.replace('exp://', 'http://');
-
   const path = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
 
   if (process.env.NODE_ENV === 'development') {
-    return origin.concat(path);
+    // Constants.experienceUrl isn't available on all platforms (e.g. web).
+    // Fallback to the current location when it isn't defined.
+    const devOrigin =
+      Constants.experienceUrl?.replace('exp://', 'http://') ??
+      (typeof location !== 'undefined' ? location.origin : '');
+
+    return devOrigin.concat(path);
   }
 
   if (!process.env.EXPO_PUBLIC_API_BASE_URL) {
